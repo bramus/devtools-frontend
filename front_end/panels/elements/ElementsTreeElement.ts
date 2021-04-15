@@ -1991,6 +1991,8 @@ export class ElementsTreeElement extends UI.TreeOutline.TreeElement {
     const isGrid = display === 'grid' || display === 'inline-grid';
     const isFlex = display === 'flex' || display === 'inline-flex';
 
+    const contain = styles.get('contain')?.toString() ?? '';
+
     const appendAdorner = (adorner?: Adorner|null): void => {
       if (adorner) {
         this._styleAdorners.push(adorner);
@@ -2005,6 +2007,23 @@ export class ElementsTreeElement extends UI.TreeOutline.TreeElement {
     if (styles.get('scroll-snap-type') && styles.get('scroll-snap-type') !== 'none') {
       appendAdorner(this.createScrollSnapAdorner());
     }
+    if (contain && contain.includes('layout') && (contain.includes('inline-size') || contain.includes('block-size') || contain.includes('size'))) {
+      appendAdorner(this.createContainerQueryAdorner(contain));
+    }
+  }
+
+  createContainerQueryAdorner(containStyle: string): Adorner|null {
+    const node = this.node();
+    const nodeId = node.id;
+    if (!nodeId) {
+      return null;
+    }
+
+    const adorner = this.adornText('containment-context', AdornerCategories.Layout);
+    // adorner.classList.add(`containment-context ${containStyle}`);
+    adorner.classList.add('containment-context');
+
+    return adorner;
   }
 
   createGridAdorner(): Adorner|null {

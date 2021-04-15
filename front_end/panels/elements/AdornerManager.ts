@@ -34,6 +34,10 @@ export const DefaultAdornerSettings = [
     adorner: 'scroll-snap',
     isEnabled: true,
   },
+  {
+    adorner: 'containment-context',
+    isEnabled: true,
+  },
 ];
 
 interface SettingStore<Setting> {

@@ -1172,6 +1172,34 @@ const TrackedCSSGridProperties = [
     name: 'display',
     value: 'inline-flex',
   },
+  {
+    name: 'contain',
+    value: 'none',
+  },
+  {
+    name: 'contain',
+    value: 'layout inline-size',
+  },
+  {
+    name: 'contain',
+    value: 'layout block-size',
+  },
+  {
+    name: 'contain',
+    value: 'layout size',
+  },
+  {
+    name: 'contain',
+    value: 'inline-size layout',
+  },
+  {
+    name: 'contain',
+    value: 'block-size layout',
+  },
+  {
+    name: 'contain',
+    value: 'size layout',
+  },
 ];
 
 let contextMenuProviderInstance: ContextMenuProvider;
