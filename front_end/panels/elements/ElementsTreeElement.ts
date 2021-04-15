@@ -38,6 +38,7 @@ import * as Common from '../../core/common/common.js';
 import * as Host from '../../core/host/host.js';
 import * as i18n from '../../core/i18n/i18n.js';
 import * as Platform from '../../core/platform/platform.js';
+import * as Root from '../../core/root/root.js';
 import * as SDK from '../../core/sdk/sdk.js';
 import * as TextUtils from '../../models/text_utils/text_utils.js';
 import * as TextEditor from '../../ui/legacy/components/text_editor/text_editor.js';  // eslint-disable-line no-unused-vars
@@ -2007,8 +2008,12 @@ export class ElementsTreeElement extends UI.TreeOutline.TreeElement {
     if (styles.get('scroll-snap-type') && styles.get('scroll-snap-type') !== 'none') {
       appendAdorner(this.createScrollSnapAdorner());
     }
-    if (contain && contain.includes('layout') && (contain.includes('inline-size') || contain.includes('block-size') || contain.includes('size'))) {
-      appendAdorner(this.createContainerQueryAdorner(contain));
+
+    if (Root.Runtime.experiments.isEnabled('containerQueries')) {
+      const contain = styles.get('contain')?.toString() ?? '';
+      if (contain && contain.includes('layout') && (contain.includes('inline-size') || contain.includes('block-size') || contain.includes('size'))) {
+        appendAdorner(this.createContainerQueryAdorner(contain));
+      }
     }
   }
 

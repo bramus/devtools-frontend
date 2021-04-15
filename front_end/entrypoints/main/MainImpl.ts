@@ -274,6 +274,10 @@ export class MainImpl {
     // New cookie features.
     Root.Runtime.experiments.register('experimentalCookieFeatures', 'Enable experimental cookie features');
 
+    // Container Queries
+    // https://bugs.chromium.org/p/chromium/issues/detail?id=1146422
+    Root.Runtime.experiments.register('containerQueries', 'Enable Container Queries Support');
+
     Root.Runtime.experiments.cleanUpStaleExperiments();
     const enabledExperiments = Root.Runtime.Runtime.queryParam('enabledExperiments');
     if (enabledExperiments) {
