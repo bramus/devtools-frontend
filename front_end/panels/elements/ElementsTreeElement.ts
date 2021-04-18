@@ -2012,12 +2012,12 @@ export class ElementsTreeElement extends UI.TreeOutline.TreeElement {
     if (Root.Runtime.experiments.isEnabled('containerQueries')) {
       const contain = styles.get('contain')?.toString() ?? '';
       if (contain && contain.includes('layout') && (contain.includes('inline-size') || contain.includes('block-size') || contain.includes('size'))) {
-        appendAdorner(this.createContainerQueryAdorner(contain));
+        appendAdorner(this.createContainmentContextAdorner(contain));
       }
     }
   }
 
-  createContainerQueryAdorner(containStyle: string): Adorner|null {
+  createContainmentContextAdorner(containStyle: string): Adorner|null {
     const node = this.node();
     const nodeId = node.id;
     if (!nodeId) {
