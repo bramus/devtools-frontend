@@ -89,6 +89,29 @@ const flexContainerNodesToElements = (nodes: SDK.DOMModel.DOMNode[]): LayoutElem
   });
 };
 
+const containmentContextContainerNodesToElements = (nodes: SDK.DOMModel.DOMNode[]): LayoutElement[] => {
+  return nodes.map(node => {
+    const layoutElement = nodeToLayoutElement(node);
+    const nodeId = node.id;
+    return {
+      ...layoutElement,
+      color: node.domModel().overlayModel().colorOfContainmentContextInPersistentOverlay(nodeId) || '#000',
+      enabled: node.domModel().overlayModel().isHighlightedContainmentContextInPersistentOverlay(nodeId),
+      toggle: (value: boolean): void => {
+        if (value) {
+          node.domModel().overlayModel().highlightContainmentContextInPersistentOverlay(nodeId);
+        } else {
+          node.domModel().overlayModel().hideContainmentContextInPersistentOverlay(nodeId);
+        }
+      },
+      setColor(value: string): void {
+        this.color = value;
+        node.domModel().overlayModel().setColorOfContainmentContextInPersistentOverlay(nodeId, value);
+      },
+    };
+  });
+};
+
 export class LayoutSidebarPane extends UI.ThrottledWidget.ThrottledWidget {
   _layoutPane: LayoutPane;
   _settings: string[];
@@ -124,6 +147,8 @@ export class LayoutSidebarPane extends UI.ThrottledWidget.ThrottledWidget {
     overlayModel.addEventListener(SDK.OverlayModel.Events.PersistentGridOverlayStateChanged, this.update, this);
     overlayModel.addEventListener(
         SDK.OverlayModel.Events.PersistentFlexContainerOverlayStateChanged, this.update, this);
+    overlayModel.addEventListener(
+        SDK.OverlayModel.Events.PersistentContainmentContextOverlayStateChanged, this.update, this);
     this._domModels.push(domModel);
   }
 
@@ -132,6 +157,8 @@ export class LayoutSidebarPane extends UI.ThrottledWidget.ThrottledWidget {
     overlayModel.removeEventListener(SDK.OverlayModel.Events.PersistentGridOverlayStateChanged, this.update, this);
     overlayModel.removeEventListener(
         SDK.OverlayModel.Events.PersistentFlexContainerOverlayStateChanged, this.update, this);
+    overlayModel.removeEventListener(
+        SDK.OverlayModel.Events.PersistentContainmentContextOverlayStateChanged, this.update, this);
     this._domModels = this._domModels.filter(model => model !== domModel);
   }
 
@@ -168,6 +195,14 @@ export class LayoutSidebarPane extends UI.ThrottledWidget.ThrottledWidget {
 
   async _fetchFlexContainerNodes(): Promise<SDK.DOMModel.DOMNode[]> {
     return await this._fetchNodesByStyle([{name: 'display', value: 'flex'}, {name: 'display', value: 'inline-flex'}]);
+  }
+
+  async _fetchContainmentContextContainerNodes(): Promise<SDK.DOMModel.DOMNode[]> {
+    return await this._fetchNodesByStyle([
+      {name: 'contain', value: 'size layout'},
+      {name: 'contain', value: 'inline-size layout'},
+      {name: 'contain', value: 'block-size layout'},
+    ]);
   }
 
   _mapSettings(): Setting[] {
@@ -214,6 +249,8 @@ export class LayoutSidebarPane extends UI.ThrottledWidget.ThrottledWidget {
     this._layoutPane.data = {
       gridElements: gridNodesToElements(await this._fetchGridNodes()),
       flexContainerElements: flexContainerNodesToElements(await this._fetchFlexContainerNodes()),
+      containmentContextContainerElements:
+          containmentContextContainerNodesToElements(await this._fetchContainmentContextContainerNodes()),
       settings: this._mapSettings(),
     };
   }

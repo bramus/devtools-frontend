@@ -53,6 +53,18 @@ const UIStrings = {
   *@description Text in the Layout panel, when no flexbox elements are found
   */
   noFlexboxLayoutsFoundOnThisPage: 'No flexbox layouts found on this page',
+  /**
+  *@description Title of the Containment Contexts section in the Layout panel
+  */
+  containmentContext: 'Containment Contexts',
+  /**
+  *@description Title of a section in the Layout panel
+  */
+  containmentContextOverlays: 'Containment Context overlays',
+  /**
+  *@description Text in the Layout panel, when no Containment Context elements are found
+  */
+  noContainmentContextsFoundOnThisPage: 'No Containment Contexts found on this page',
 };
 const str_ = i18n.i18n.registerUIStrings('panels/elements/LayoutPane.ts', UIStrings);
 const i18nString = i18n.i18n.getLocalizedString.bind(undefined, str_);
@@ -86,6 +98,7 @@ export interface LayoutPaneData {
   settings: Setting[];
   gridElements: LayoutElement[];
   flexContainerElements?: LayoutElement[];
+  containmentContextContainerElements?: LayoutElement[];
 }
 
 export class LayoutPane extends HTMLElement {
@@ -93,6 +106,7 @@ export class LayoutPane extends HTMLElement {
   private settings: Readonly<Setting[]> = [];
   private gridElements: Readonly<LayoutElement[]> = [];
   private flexContainerElements?: Readonly<LayoutElement[]> = [];
+  private containmentContextContainerElements?: Readonly<LayoutElement[]> = [];
 
   constructor() {
     super();
@@ -108,6 +122,7 @@ export class LayoutPane extends HTMLElement {
     this.settings = data.settings;
     this.gridElements = data.gridElements;
     this.flexContainerElements = data.flexContainerElements;
+    this.containmentContextContainerElements = data.containmentContextContainerElements;
     this.render();
   }
 
@@ -184,6 +199,25 @@ export class LayoutPane extends HTMLElement {
               ${this.flexContainerElements.length ?
                 html`<div class="elements">
                   ${this.flexContainerElements.map(element => this.renderElement(element))}
+                </div>` : ''}
+            </div>` : ''}
+        </details>
+        `
+      : ''}
+      ${this.containmentContextContainerElements !== undefined ?
+        html`
+        <details open>
+          <summary class="header" @keydown=${this.onSummaryKeyDown}>
+            ${i18nString(UIStrings.containmentContext)}
+          </summary>
+          ${this.containmentContextContainerElements ?
+            html`<div class="content-section">
+              <h3 class="content-section-title">
+                ${this.containmentContextContainerElements.length ? i18nString(UIStrings.containmentContextOverlays) : i18nString(UIStrings.noContainmentContextsFoundOnThisPage)}
+              </h3>
+              ${this.containmentContextContainerElements.length ?
+                html`<div class="elements">
+                  ${this.containmentContextContainerElements.map(element => this.renderElement(element))}
                 </div>` : ''}
             </div>` : ''}
         </details>

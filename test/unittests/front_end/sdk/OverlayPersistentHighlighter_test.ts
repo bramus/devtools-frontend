@@ -29,6 +29,7 @@ describeWithEnvironment('OverlayColorGenerator', () => {
             invoke_setShowGridOverlays() {},
             invoke_setShowFlexOverlays() {},
             invoke_setShowScrollSnapOverlays() {},
+            invoke_setShowContainmentContextOverlays() {},
           };
         },
       };

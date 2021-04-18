@@ -4001,6 +4001,9 @@
   "panels/elements/ElementsTreeElement.ts | deleteElement": {
     "message": "Delete element"
   },
+  "panels/elements/ElementsTreeElement.ts | disableContainmentContext": {
+    "message": "Disable Containment Context overlay"
+  },
   "panels/elements/ElementsTreeElement.ts | disableFlexMode": {
     "message": "Disable flex mode"
   },
@@ -4021,6 +4024,9 @@
   },
   "panels/elements/ElementsTreeElement.ts | editText": {
     "message": "Edit text"
+  },
+  "panels/elements/ElementsTreeElement.ts | enableContainmentContext": {
+    "message": "Enable Containment Context overlay"
   },
   "panels/elements/ElementsTreeElement.ts | enableFlexMode": {
     "message": "Enable flex mode"
@@ -4112,6 +4118,12 @@
   "panels/elements/FlexboxEditorWidget.ts | editorButton": {
     "message": "Open Flexbox editor"
   },
+  "panels/elements/LayoutPane.ts | containmentContext": {
+    "message": "Containment Contexts"
+  },
+  "panels/elements/LayoutPane.ts | containmentContextOverlays": {
+    "message": "Containment Context overlays"
+  },
   "panels/elements/LayoutPane.ts | feedback": {
     "message": "Feedback"
   },
@@ -4126,6 +4138,9 @@
   },
   "panels/elements/LayoutPane.ts | gridOverlays": {
     "message": "Grid overlays"
+  },
+  "panels/elements/LayoutPane.ts | noContainmentContextsFoundOnThisPage": {
+    "message": "No Containment Contexts found on this page"
   },
   "panels/elements/LayoutPane.ts | noFlexboxLayoutsFoundOnThisPage": {
     "message": "No flexbox layouts found on this page"

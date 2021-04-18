@@ -76,6 +76,7 @@ ts_library("inspector_overlay") {
     "common.ts",
     "css_grid_label_helpers.ts",
     "highlight_common.ts",
+    "highlight_containment_context.ts",
     "highlight_flex_common.ts",
     "highlight_grid_common.ts",
     "highlight_scroll_snap.ts",

@@ -194,6 +194,16 @@ const UIStrings = {
   * the overlay showing CSS scroll snapping for the current element.
   */
   disableScrollSnap: 'Disable scroll-snap overlay',
+  /**
+  *@description Label of an adorner in the Elements panel. When clicked, it enables
+  * the overlay showing CSS Container Queries' Containment Context for the current element.
+  */
+  enableContainmentContext: 'Enable Containment Context overlay',
+  /**
+  *@description Label of an adorner in the Elements panel. When clicked, it disables
+  * the overlay showing CSS Container Queries' Containment Context for the current element.
+  */
+  disableContainmentContext: 'Disable Containment Context overlay',
 };
 const str_ = i18n.i18n.registerUIStrings('panels/elements/ElementsTreeElement.ts', UIStrings);
 const i18nString = i18n.i18n.getLocalizedString.bind(undefined, str_);
@@ -1992,8 +2002,6 @@ export class ElementsTreeElement extends UI.TreeOutline.TreeElement {
     const isGrid = display === 'grid' || display === 'inline-grid';
     const isFlex = display === 'flex' || display === 'inline-flex';
 
-    const contain = styles.get('contain')?.toString() ?? '';
-
     const appendAdorner = (adorner?: Adorner|null): void => {
       if (adorner) {
         this._styleAdorners.push(adorner);
@@ -2011,7 +2019,8 @@ export class ElementsTreeElement extends UI.TreeOutline.TreeElement {
 
     if (Root.Runtime.experiments.isEnabled('containerQueries')) {
       const contain = styles.get('contain')?.toString() ?? '';
-      if (contain && contain.includes('layout') && (contain.includes('inline-size') || contain.includes('block-size') || contain.includes('size'))) {
+      if (contain && contain.includes('layout') &&
+          (contain.includes('inline-size') || contain.includes('block-size') || contain.includes('size'))) {
         appendAdorner(this.createContainmentContextAdorner(contain));
       }
     }
@@ -2024,9 +2033,40 @@ export class ElementsTreeElement extends UI.TreeOutline.TreeElement {
       return null;
     }
 
+    let containmentContext = 'both';
+    if (containStyle.includes('inline-size')) {
+      containmentContext = 'inline';
+    }
+    if (containStyle.includes('block-size')) {
+      containmentContext = 'block';
+    }
+
     const adorner = this.adornText('containment-context', AdornerCategories.Layout);
-    // adorner.classList.add(`containment-context ${containStyle}`);
     adorner.classList.add('containment-context');
+    adorner.classList.add(`containment-context--${containmentContext}`);
+
+    const onClick = (((): void => {
+                       if (adorner.isActive()) {
+                         node.domModel().overlayModel().highlightContainmentContextInPersistentOverlay(nodeId);
+                       } else {
+                         node.domModel().overlayModel().hideContainmentContextInPersistentOverlay(nodeId);
+                       }
+                     }) as EventListener);
+    adorner.addInteraction(onClick, {
+      isToggle: true,
+      shouldPropagateOnKeydown: false,
+      ariaLabelDefault: i18nString(UIStrings.enableContainmentContext),
+      ariaLabelActive: i18nString(UIStrings.disableContainmentContext),
+    });
+
+    node.domModel().overlayModel().addEventListener(
+        SDK.OverlayModel.Events.PersistentContainmentContextOverlayStateChanged, event => {
+          const {nodeId: eventNodeId, enabled} = event.data;
+          if (eventNodeId !== nodeId) {
+            return;
+          }
+          adorner.toggle(enabled);
+        });
 
     return adorner;
   }

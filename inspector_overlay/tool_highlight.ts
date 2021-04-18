@@ -32,6 +32,7 @@ import {contrastRatio, contrastRatioAPCA, getAPCAThreshold, getContrastThreshold
 
 import {Bounds, constrainNumber, createChild, createElement, createTextChild, ellipsify, Overlay, PathCommands, ResetData} from './common.js';
 import {drawPath, emptyBounds, formatColor, formatRgba, parseHexa, PathBounds} from './highlight_common.js';
+import {ContainmentContextHighlight, drawContainmentContextHighlight} from './highlight_containment_context.js';
 import {drawLayoutFlexContainerHighlight, drawLayoutFlexItemHighlight, FlexContainerHighlight, FlexItemHighlight} from './highlight_flex_common.js';
 import {drawLayoutGridHighlight, GridHighlight} from './highlight_grid_common.js';
 import {ScrollSnapHighlight} from './highlight_scroll_snap.js';
@@ -76,6 +77,7 @@ interface Highlight {
   elementInfo: ElementInfo;
   colorFormat: string;
   gridInfo: GridHighlight[];
+  containmentContextInfo: ContainmentContextHighlight[];
   flexInfo: FlexContainerHighlight[];
   flexItemInfo: FlexItemHighlight[];
 }
@@ -183,6 +185,14 @@ export class HighlightOverlay extends Overlay {
       }
     }
 
+    if (highlight.containmentContextInfo) {
+      for (const containmentContext of highlight.containmentContextInfo) {
+        drawContainmentContextHighlight(
+            containmentContext, this.context, this.deviceScaleFactor, this.canvasWidth, this.canvasHeight,
+            this.emulationScaleFactor);
+      }
+    }
+
     if (highlight.flexInfo) {
       for (const flex of highlight.flexInfo) {
         drawLayoutFlexContainerHighlight(
@@ -226,6 +236,10 @@ export class HighlightOverlay extends Overlay {
 
   drawScrollSnapHighlight(highlight: ScrollSnapHighlight) {
     this.persistentOverlay?.drawScrollSnapHighlight(highlight);
+  }
+
+  drawContainmentContextHighlight(highlight: ContainmentContextHighlight) {
+    this.persistentOverlay?.drawContainmentContextHighlight(highlight);
   }
 
   private drawAxis(context: CanvasRenderingContext2D, rulerAtRight: boolean, rulerAtBottom: boolean) {

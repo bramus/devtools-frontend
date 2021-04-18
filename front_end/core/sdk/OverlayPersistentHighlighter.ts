@@ -12,10 +12,12 @@ export class OverlayPersistentHighlighter {
   _model: OverlayModel;
   _gridHighlights: Map<number, Protocol.Overlay.GridHighlightConfig>;
   _scrollSnapHighlights: Map<number, Protocol.Overlay.ScrollSnapContainerHighlightConfig>;
+  _containmentContextHighlights: Map<number, Protocol.Overlay.ContainmentContextHighlightConfig>;
   _flexHighlights: Map<number, Protocol.Overlay.FlexContainerHighlightConfig>;
   _colors: Map<number, Common.Color.Color>;
   _gridColorGenerator: OverlayColorGenerator;
   _flexColorGenerator: OverlayColorGenerator;
+  _containmentContextColorGenerator: OverlayColorGenerator;
   _flexEnabled: boolean;
   // TODO(crbug.com/1172300) Ignored during the jsdoc to ts migration
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -36,12 +38,15 @@ export class OverlayPersistentHighlighter {
 
     this._scrollSnapHighlights = new Map();
 
+    this._containmentContextHighlights = new Map();
+
     this._flexHighlights = new Map();
 
     this._colors = new Map();
 
     this._gridColorGenerator = new OverlayColorGenerator();
     this._flexColorGenerator = new OverlayColorGenerator();
+    this._containmentContextColorGenerator = new OverlayColorGenerator();
     this._flexEnabled = flexEnabled;
 
     this._showGridLineLabelsSetting = Common.Settings.Settings.instance().moduleSetting('showGridLineLabels');
@@ -113,6 +118,13 @@ export class OverlayPersistentHighlighter {
     };
   }
 
+  _buildContainmentContextHighlightConfig(_nodeId: number): Protocol.Overlay.ContainmentContextHighlightConfig {
+    const mainColor = this.colorOfContainmentContext(_nodeId);
+    return {
+      containerBorder: {color: mainColor.toProtocolRGBA(), pattern: Protocol.Overlay.LineStylePattern.Dashed},
+    };
+  }
+
   highlightGridInOverlay(nodeId: number): void {
     this._gridHighlights.set(nodeId, this._buildGridHighlightConfig(nodeId));
     this._updateHighlightsInOverlay();
@@ -159,6 +171,22 @@ export class OverlayPersistentHighlighter {
     }
   }
 
+  highlightContainmentContextInOverlay(nodeId: number): void {
+    this._containmentContextHighlights.set(nodeId, this._buildContainmentContextHighlightConfig(nodeId));
+    this._updateHighlightsInOverlay();
+  }
+
+  isContainmentContextHighlighted(nodeId: number): boolean {
+    return this._containmentContextHighlights.has(nodeId);
+  }
+
+  hideContainmentContextInOverlay(nodeId: number): void {
+    if (this._containmentContextHighlights.has(nodeId)) {
+      this._containmentContextHighlights.delete(nodeId);
+      this._updateHighlightsInOverlay();
+    }
+  }
+
   highlightFlexInOverlay(nodeId: number): void {
     this._flexHighlights.set(nodeId, this._buildFlexContainerHighlightConfig(nodeId));
     this._updateHighlightsInOverlay();
@@ -179,6 +207,20 @@ export class OverlayPersistentHighlighter {
   }
 
   setColorOfFlex(nodeId: number, color: Common.Color.Color): void {
+    this._colors.set(nodeId, color);
+  }
+
+  colorOfContainmentContext(nodeId: number): Common.Color.Color {
+    let color = this._colors.get(nodeId);
+    if (!color) {
+      color = this._containmentContextColorGenerator.next();
+      this._colors.set(nodeId, color);
+    }
+
+    return color;
+  }
+
+  setColorOfContainmentContext(nodeId: number, color: Common.Color.Color): void {
     this._colors.set(nodeId, color);
   }
 
@@ -220,6 +262,9 @@ export class OverlayPersistentHighlighter {
     for (const nodeId of this._gridHighlights.keys()) {
       this._gridHighlights.set(nodeId, this._buildGridHighlightConfig(nodeId));
     }
+    for (const nodeId of this._containmentContextHighlights.keys()) {
+      this._containmentContextHighlights.set(nodeId, this._buildContainmentContextHighlightConfig(nodeId));
+    }
     for (const nodeId of this._flexHighlights.keys()) {
       this._flexHighlights.set(nodeId, this._buildFlexContainerHighlightConfig(nodeId));
     }
@@ -232,9 +277,20 @@ export class OverlayPersistentHighlighter {
   _updateHighlightsInOverlay(): void {
     const hasNodesToHighlight = this._gridHighlights.size > 0 || this._flexHighlights.size > 0;
     this._model.setShowViewportSizeOnResize(!hasNodesToHighlight);
+    this._updateContainmentContextHighlightsInOverlay();
     this._updateGridHighlightsInOverlay();
     this._updateFlexHighlightsInOverlay();
     this._updateScrollSnapHighlightsInOverlay();
+  }
+
+  _updateContainmentContextHighlightsInOverlay(): void {
+    const overlayModel = this._model;
+    const containmentContextNodeHighlightConfigs = [];
+    for (const [nodeId, containmentContextHighlightConfig] of this._containmentContextHighlights.entries()) {
+      containmentContextNodeHighlightConfigs.push({nodeId, containmentContextHighlightConfig});
+    }
+    overlayModel.target().overlayAgent().invoke_setShowContainmentContextOverlays(
+        {containmentContextNodeHighlightConfigs});
   }
 
   _updateGridHighlightsInOverlay(): void {
@@ -301,6 +357,15 @@ export interface OverlayAgent {
   invoke_setShowScrollSnapOverlays(param: {
     scrollSnapHighlightConfigs: Array<{
       nodeId: number,
+    }>,
+  }): void;
+
+  // TODO(crbug.com/1172300) Ignored during the jsdoc to ts migration
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  invoke_setShowContainmentContextOverlays(param: {
+    containmentContextNodeHighlightConfigs: Array<{
+      nodeId: number,
+      containmentContextHighlightConfig: Protocol.Overlay.ContainmentContextHighlightConfig,
     }>,
   }): void;
 }

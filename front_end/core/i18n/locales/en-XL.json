@@ -4001,6 +4001,9 @@
   "panels/elements/ElementsTreeElement.ts | deleteElement": {
     "message": "D̂él̂ét̂é êĺêḿêńt̂"
   },
+  "panels/elements/ElementsTreeElement.ts | disableContainmentContext": {
+    "message": "D̂íŝáb̂ĺê Ćôńt̂áîńm̂én̂t́ Ĉón̂t́êx́t̂ óv̂ér̂ĺâý"
+  },
   "panels/elements/ElementsTreeElement.ts | disableFlexMode": {
     "message": "D̂íŝáb̂ĺê f́l̂éx̂ ḿôd́ê"
   },
@@ -4021,6 +4024,9 @@
   },
   "panels/elements/ElementsTreeElement.ts | editText": {
     "message": "Êd́ît́ t̂éx̂t́"
+  },
+  "panels/elements/ElementsTreeElement.ts | enableContainmentContext": {
+    "message": "Êńâb́l̂é Ĉón̂t́âín̂ḿêńt̂ Ćôńt̂éx̂t́ ôv́êŕl̂áŷ"
   },
   "panels/elements/ElementsTreeElement.ts | enableFlexMode": {
     "message": "Êńâb́l̂é f̂ĺêx́ m̂ód̂é"
@@ -4112,6 +4118,12 @@
   "panels/elements/FlexboxEditorWidget.ts | editorButton": {
     "message": "Ôṕêń F̂ĺêx́b̂óx̂ éd̂ít̂ór̂"
   },
+  "panels/elements/LayoutPane.ts | containmentContext": {
+    "message": "Ĉón̂t́âín̂ḿêńt̂ Ćôńt̂éx̂t́ŝ"
+  },
+  "panels/elements/LayoutPane.ts | containmentContextOverlays": {
+    "message": "Ĉón̂t́âín̂ḿêńt̂ Ćôńt̂éx̂t́ ôv́êŕl̂áŷś"
+  },
   "panels/elements/LayoutPane.ts | feedback": {
     "message": "F̂éêd́b̂áĉḱ"
   },
@@ -4126,6 +4138,9 @@
   },
   "panels/elements/LayoutPane.ts | gridOverlays": {
     "message": "Ĝŕîd́ ôv́êŕl̂áŷś"
+  },
+  "panels/elements/LayoutPane.ts | noContainmentContextsFoundOnThisPage": {
+    "message": "N̂ó Ĉón̂t́âín̂ḿêńt̂ Ćôńt̂éx̂t́ŝ f́ôún̂d́ ôń t̂h́îś p̂áĝé"
   },
   "panels/elements/LayoutPane.ts | noFlexboxLayoutsFoundOnThisPage": {
     "message": "N̂ó f̂ĺêx́b̂óx̂ ĺâýôút̂ś f̂óûńd̂ ón̂ t́ĥíŝ ṕâǵê"

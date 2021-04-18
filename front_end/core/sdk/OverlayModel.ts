@@ -338,6 +338,29 @@ export class OverlayModel extends SDKModel implements ProtocolProxyApi.OverlayDi
     this.dispatchEventToListeners(Events.PersistentGridOverlayStateChanged, {nodeId, enabled: false});
   }
 
+  highlightContainmentContextInPersistentOverlay(nodeId: number): void {
+    if (!this._peristentHighlighter) {
+      return;
+    }
+    this._peristentHighlighter.highlightContainmentContextInOverlay(nodeId);
+    this.dispatchEventToListeners(Events.PersistentContainmentContextOverlayStateChanged, {nodeId, enabled: true});
+  }
+
+  isHighlightedContainmentContextInPersistentOverlay(nodeId: number): boolean {
+    if (!this._peristentHighlighter) {
+      return false;
+    }
+    return this._peristentHighlighter.isContainmentContextHighlighted(nodeId);
+  }
+
+  hideContainmentContextInPersistentOverlay(nodeId: number): void {
+    if (!this._peristentHighlighter) {
+      return;
+    }
+    this._peristentHighlighter.hideContainmentContextInOverlay(nodeId);
+    this.dispatchEventToListeners(Events.PersistentContainmentContextOverlayStateChanged, {nodeId, enabled: false});
+  }
+
   highlightScrollSnapInPersistentOverlay(nodeId: number): void {
     if (!this._peristentHighlighter) {
       return;
@@ -430,6 +453,25 @@ export class OverlayModel extends SDKModel implements ProtocolProxyApi.OverlayDi
     this._peristentHighlighter.resetOverlay();
   }
 
+  colorOfContainmentContextInPersistentOverlay(nodeId: number): string|null {
+    if (!this._peristentHighlighter) {
+      return null;
+    }
+    return this._peristentHighlighter.colorOfContainmentContext(nodeId).asString(Common.Color.Format.HEX);
+  }
+
+  setColorOfContainmentContextInPersistentOverlay(nodeId: number, colorStr: string): void {
+    if (!this._peristentHighlighter) {
+      return;
+    }
+    const color = Common.Color.Color.parse(colorStr);
+    if (!color) {
+      return;
+    }
+    this._peristentHighlighter.setColorOfContainmentContext(nodeId, color);
+    this._peristentHighlighter.resetOverlay();
+  }
+
   hideSourceOrderInOverlay(): void {
     this._sourceOrderHighlighter.hideSourceOrderHighlight();
   }
@@ -481,6 +523,7 @@ export class OverlayModel extends SDKModel implements ProtocolProxyApi.OverlayDi
       showExtensionLines: showRulers,
       gridHighlightConfig: {},
       flexContainerHighlightConfig: {},
+      containmentContextHighlightConfig: {},
       flexItemHighlightConfig: {},
       contrastAlgorithm: Root.Runtime.experiments.isEnabled('APCA') ? Protocol.Overlay.ContrastAlgorithm.Apca :
                                                                       Protocol.Overlay.ContrastAlgorithm.Aa,
@@ -516,6 +559,13 @@ export class OverlayModel extends SDKModel implements ProtocolProxyApi.OverlayDi
         columnLineColor: Common.Color.PageHighlight.LayoutLine.toProtocolRGBA(),
         rowLineDash: true,
         columnLineDash: true,
+      };
+
+      highlightConfig.containmentContextHighlightConfig = {
+        containerBorder: {
+          color: Common.Color.PageHighlight.LayoutLine.toProtocolRGBA(),
+          pattern: Protocol.Overlay.LineStylePattern.Dashed,
+        },
       };
 
       highlightConfig.flexContainerHighlightConfig = {
@@ -742,6 +792,7 @@ export enum Events {
   PersistentGridOverlayStateChanged = 'PersistentGridOverlayStateChanged',
   PersistentFlexContainerOverlayStateChanged = 'PersistentFlexContainerOverlayStateChanged',
   PersistentScrollSnapOverlayStateChanged = 'PersistentScrollSnapOverlayStateChanged',
+  PersistentContainmentContextOverlayStateChanged = 'PersistentContainmentContextOverlayStateChanged',
 }
 
 
